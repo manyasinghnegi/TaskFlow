@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TaskFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
+      color: white;
+      min-height: 100vh;
+    }
+    .hidden { display: none !important; }
+
+    /* === Landing Page === */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 400px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      margin: 10vh auto;
+    }
+    .logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: white;
+    }
+    .glass-card input,
+    .glass-card button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: none;
+      font-size: 1rem;
+    }
+    .glass-card input {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    .glass-card input::placeholder { color: #ccc; }
+    .glass-card button {
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .error {
+      color: #ff6b6b;
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: -0.5rem;
+    }
+    .terms {
+      font-size: 0.75rem;
+      text-align: center;
+      margin-top: 1rem;
+      opacity: 0.7;
+    }
+
+    /* === Todo App === */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: #111c26;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar {
+      background: #007bff;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 1rem auto;
+      max-width: 700px;
+    }
+    .tab {
+      padding: 10px 20px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .tab.active {
+      background: white;
+      color: black;
+      font-weight: 600;
+    }
+    .task-form {
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      gap: 10px;
+      padding: 0 1rem;
+    }
+    .task-form input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    .task-form button {
+      padding: 10px 16px;
+      background: #007bff;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+    .tasks {
+      max-width: 700px;
+      margin: auto;
+      padding: 0 1rem;
+    }
+    .task-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .task-card p { margin: 0 0 0.5rem; }
+    .task-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    .btn-secondary {
+      background: #e4e6eb;
+      color: black;
+    }
+    .timestamp {
+      font-size: 0.75rem;
+      opacity: 0.6;
+      margin-top: 0.5rem;
+    }
+    button#signOut {
+      background: white;
+      color: black;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      color: black;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Landing Page -->
+  <div id="landing">
+    <div class="glass-card">
+      <div class="logo">
+        <div class="logo-icon">🔒</div>
+        <h1>TaskFlow</h1>
+        <p style="font-size: 0.9rem; opacity: 0.8;">Your Personal Productivity Companion</p>
+      </div>
+      <form id="userForm">
+        <input type="text" id="name" placeholder="Full Name" required />
+        <input type="date" id="dob" required />
+        <p class="error" id="error"></p>
+        <button type="submit">✔ Verify & Continue</button>
+        <div class="terms">By continuing, you confirm you are over 10 years old.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Todo App -->
+  <div id="app" class="hidden">
+    <header>
+      <h2>My Todo App</h2>
+      <div class="profile">
+        <span id="userName">User</span>
+        <div class="avatar" id="avatar">U</div>
+        <button id="signOut">Sign Out</button>
+      </div>
+    </header>
+
+    <div class="tabs">
+      <div class="tab active" data-stage="todo">Todo (<span id="todoCount">0</span>)</div>
+      <div class="tab" data-stage="completed">Completed (<span id="completedCount">0</span>)</div>
+      <div class="tab" data-stage="archived">Archived (<span id="archivedCount">0</span>)</div>
+    </div>
+
+    <div class="task-form">
+      <input type="text" id="taskInput" placeholder="Add your task" />
+      <button id="addTask">Submit</button>
+    </div>
+
+    <div class="tasks" id="taskList"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"><strong>Task Updated</strong><br><span id="toastMsg"></span></div>
+
+  <script>
+    const landing = document.getElementById("landing");
+    const app = document.getElementById("app");
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) showApp(user);
+
+    document.getElementById("userForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const dob = new Date(document.getElementById("dob").value);
+      const error = document.getElementById("error");
+      if (!name || isNaN(dob)) {
+        error.textContent = "Please fill all fields correctly.";
+        return;
+      }
+      const age = new Date().getFullYear() - dob.getFullYear();
+      const m = new Date().getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && new Date().getDate() < dob.getDate())) age--;
+      if (age <= 10) {
+        error.textContent = "You must be older than 10 years.";
+        return;
+      }
+      localStorage.setItem("user", JSON.stringify({ name, dob }));
+      showApp({ name });
+    });
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toastMsg").textContent = msg;
+      toast.style.display = "block";
+      setTimeout(() => toast.style.display = "none", 3000);
+    }
+
+    function showApp(user) {
+      landing.classList.add("hidden");
+      app.classList.remove("hidden");
+
+      document.getElementById("userName").textContent = user.name;
+      document.getElementById("avatar").textContent = user.name.charAt(0).toUpperCase();
+
+      const stages = { todo: [], completed: [], archived: [] };
+      let currentStage = "todo";
+      const taskList = document.getElementById("taskList");
+
+      const stageCounts = {
+        todo: document.getElementById("todoCount"),
+        completed: document.getElementById("completedCount"),
+        archived: document.getElementById("archivedCount")
+      };
+
+      const saveTasks = () => localStorage.setItem("tasks", JSON.stringify(stages));
+      const renderTasks = () => {
+        taskList.innerHTML = "";
+        stages[currentStage].forEach((task, i) => {
+          const card = document.createElement("div");
+          card.className = "task-card";
+          card.innerHTML = `
+            <p>${task.text}</p>
+            <div class="task-actions">${getActions(currentStage, i)}</div>
+            <div class="timestamp">Last modified at: ${task.timestamp}</div>
+          `;
+          taskList.appendChild(card);
+        });
+        for (let s in stages) stageCounts[s].textContent = stages[s].length;
+      };
+
+      const getActions = (stage, i) => {
+        if (stage === "todo") {
+          return `<button class="btn btn-success" onclick="moveTask('todo','completed',${i})">Mark as completed</button>
+                  <button class="btn btn-secondary" onclick="moveTask('todo','archived',${i})">🗑 Archive</button>`;
+        } else if (stage === "completed") {
+          return `<button class="btn btn-secondary" onclick="moveTask('completed','todo',${i})">↩ Move to Todo</button>
+                  <button class="btn btn-secondary" onclick="moveTask('completed','archived',${i})">🗑 Archive</button>`;
+        } else {
+          return `<span style="opacity: 0.7;">Archived</span>`;
+        }
+      };
+
+      window.moveTask = (from, to, i) => {
+        const task = stages[from].splice(i, 1)[0];
+        task.timestamp = new Date().toLocaleString();
+        stages[to].push(task);
+        saveTasks();
+        renderTasks();
+        showToast(`Task moved to ${to.charAt(0).toUpperCase() + to.slice(1)}.`);
+      };
+
+      document.getElementById("addTask").addEventListener("click", () => {
+        const input = document.getElementById("taskInput");
+        const val = input.value.trim();
+        if (!val) return;
+        stages.todo.push({ text: val, timestamp: new Date().toLocaleString() });
+        input.value = "";
+        saveTasks();
+        renderTasks();
+      });
+
+      document.getElementById("signOut").addEventListener("click", () => {
+        localStorage.clear();
+        location.reload();
+      });
+
+      document.querySelectorAll(".tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+          currentStage = tab.getAttribute("data-stage");
+          renderTasks();
+        });
+      });
+
+      const stored = JSON.parse(localStorage.getItem("tasks"));
+      if (stored) {
+        Object.assign(stages, stored);
+        renderTasks();
+      } else {
+        fetch("https://dummyjson.com/todos")
+          .then(res => res.json())
+          .then(data => {
+            stages.todo = data.todos.slice(0, 5).map(t => ({
+              text: t.todo,
+              timestamp: new Date().toLocaleString()
+            }));
+            saveTasks();
+            renderTasks();
+          });
+      }
+    }
+  </script>
+</body>
+</html>
